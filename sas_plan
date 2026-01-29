@@ -1,0 +1,6 @@
+(move l2 l1)
+(pickup p1 l1)
+(move l1 l2)
+(move l2 l3)
+(getoff p1 l3)
+; cost = 5 (unit cost)
