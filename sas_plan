@@ -3,4 +3,4 @@
 (move l1 l2)
 (move l2 l3)
 (getoff p1 l3)
-; cost = 5 (unit cost)
+; cost = 7 (general cost)

@@ -1,6 +1,7 @@
 (define (domain taxi_domain1)
     (:requirements :adl :typing :negative-preconditions :action-costs)
     (:types passenger - object  location - object)
+
     (:predicates 
         (road ?l1 ?l2 - location)
         (trafficLight ?l1 ?l2 - location)
@@ -10,10 +11,13 @@
         (requestTo ?p - passenger ?l - location)
         (onTaxi ?p - passenger)
         (congested ?l - location)
-        (fullBattery)
-        (emptybattery)
-        (halfBattery)
-        (quarterBattery)
+    )
+    
+    (:functions 
+        (total-cost)
+        (distance ?l1 ?l2 - location)
+        (cost-per-distance)
+        (batteryLevel)
     )
     (:action move
         :parameters (?l1 ?l2 - location)
@@ -22,6 +26,8 @@
                     )
         :effect(and(taxiAt ?l2)
                     (not(taxiAt ?l1))
+                    (increase (total-cost)(distance ?l1 ?l2))      
+                    (decrease (batteryLevel)(* (distance ?l1 ?l2) (cost-per-distance)))              
                 )
     )
     (:action pickUp
