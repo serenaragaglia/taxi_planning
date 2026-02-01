@@ -11,6 +11,7 @@
         (requestTo ?p - passenger ?l - location)
         (onTaxi ?p - passenger)
         (congested ?l - location)
+        (rechargeStation ?l - location)
     )
     
     (:functions 
@@ -23,12 +24,26 @@
         :parameters (?l1 ?l2 - location)
         :precondition(and(taxiAt ?l1)
                         (road ?l1 ?l2)
+                        (batteryLevel)(>= (batteryLevel)(* (distance ?l1 ?l2)(cost-per-distance)))
                     )
         :effect(and(taxiAt ?l2)
                     (not(taxiAt ?l1))
                     (increase (total-cost)(distance ?l1 ?l2))      
-                    (decrease (batteryLevel)(* (distance ?l1 ?l2) (cost-per-distance)))              
+                    (decrease (batteryLevel)(* (distance ?l1 ?l2) (cost-per-distance)))
+                    (when (congested ?l2)
+                        (increase (total-cost)(* 2 (distance ?l1 ?l2))
+                    ))
                 )
+    )
+    (:action recharge
+        :parameters(?l - location)
+        :precondition(and(taxiAt ?l)
+                        (rechargeStation ?l)
+                    )
+        :effect(and(increase (batteryLevel) 100)
+                    (increase (total-cost) 10)
+        )
+                
     )
     (:action pickUp
         :parameters(?p - passenger ?l - location)   
