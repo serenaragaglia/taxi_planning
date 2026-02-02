@@ -52,7 +52,7 @@
         (= (distance office park1) 4)
         (= (distance park1 office) 4)
 
-        (= (cost-per-distance) 0.25)
+        (= (cost-per-distance) 2)
   
         (= (batteryLevel) 100)  
         (= (total-cost) 0)
