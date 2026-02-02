@@ -24,7 +24,7 @@
         :parameters (?l1 ?l2 - location)
         :precondition(and(taxiAt ?l1)
                         (road ?l1 ?l2)
-                        (batteryLevel)(>= (batteryLevel)(* (distance ?l1 ?l2)(cost-per-distance)))
+                        (>= (batteryLevel)(* (distance ?l1 ?l2)(cost-per-distance)))
                     )
         :effect(and(taxiAt ?l2)
                     (not(taxiAt ?l1))

@@ -1,7 +1,10 @@
-(define (problem taxi_problem1)
+(define (problem taxi_problem2)
     (:domain taxi_domain1)
-    (:objects p1 - passenger
-              p2 - passenger
+    (:objects 
+            p1 - passenger
+            p2 - passenger
+            p3 - passenger
+            p4 - passenger
             school - location
             restaurant - location
             bank - location
@@ -134,3 +137,11 @@
         (= (total-cost) 0)
 
     )
+    (:goal (and (passengerAt p1 park2)
+                (passengerAt p2 apartment1)
+                (passengerAt p3 mall)
+                (passengerAt p4 airport)
+        )
+    )
+    (:metric minimize (total-cost))
+)
