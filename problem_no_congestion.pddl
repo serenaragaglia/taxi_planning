@@ -32,10 +32,7 @@
         (passengerAt p2 school)
         (taxiAt office)
         
-        (requestFrom p1 restaurant)
         (requestTo p1 park2)
-
-        (requestFrom p2 school)
         (requestTo p2 office)        
         
         (= (distance school restaurant) 5)
@@ -61,13 +58,11 @@
         (= (total-cost) 0)
 
     )
-    (:goal (and (forall (?l - location)
+    (:goal (forall (?l - location)
                         (and
                             (not (requestTo p1 ?l))
                             (not (requestTo p2 ?l))
-                        )
-                )
-                (>= (batteryLevel) 80)
+                        )                                
             )        
     )
     (:metric minimize (total-cost))

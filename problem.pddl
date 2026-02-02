@@ -15,8 +15,6 @@
             apartment2 - location
             hotel - location
             airport - location
-            chargeStation1 - location
-            chargeStation2 - location
             pub - location
             mall - location
 
@@ -71,18 +69,13 @@
         (passengerAt p3 apartment2)
         (passengerAt p4 park1)
         (taxiAt office)
-        (requestFrom p4 park1)
         
-        (requestFrom p1 restaurant)
         (requestTo p1 park2)
 
-        (requestFrom p2 school)
         (requestTo p2 apartment1)    
 
-        (requestFrom p3 apartment2)
         (requestTo p3 mall)
 
-        (requestFrom p4 park1)
         (requestTo p4 airport)
 
 
@@ -128,10 +121,7 @@
         (= (distance mall apartment1) 6)
         (= (distance apartment1 mall) 6)
 
-        (congested restaurant)
-        (congested park2)
-        (congested office)
-        (= (cost-per-distance) 0.25)
+        (= (cost-per-distance) 2)
   
         (= (batteryLevel) 100)  
         (= (total-cost) 0)
