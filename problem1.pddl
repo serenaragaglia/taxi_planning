@@ -59,11 +59,8 @@
 
     )
     (:goal (forall (?l - location)
-                        (and
-                            (not (requestTo p1 ?l))
-                            (not (requestTo p2 ?l))
-                        )                                
-            )        
+                    (not(exists (?p - passenger)(requestTo ?p ?l) ))                               
+            )
     )
     (:metric minimize (total-cost))
 )

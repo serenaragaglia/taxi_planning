@@ -1,7 +1,6 @@
 (define (domain taxi_domain1)
     (:requirements :adl :typing :negative-preconditions :action-costs :disjunctive-preconditions :conditional-effects)
     (:types passenger - object  location - object)
-    (:constants chargeStation1 chargeStation2 - location )
     (:predicates 
         (road ?l1 ?l2 - location)
         (trafficLight ?l1 ?l2 - location)
@@ -10,7 +9,7 @@
         (requestTo ?p - passenger ?l - location)
         (onTaxi ?p - passenger)
         (congested ?l - location)
-        
+        (chargeStation ?l - location )        
     )
     
     (:functions 
@@ -26,18 +25,21 @@
                         (> (batteryLevel)(* (distance ?l1 ?l2) (cost-per-distance)))                         
                     )
         :effect(and(taxiAt ?l2)
-                    (not(taxiAt ?l1))
-                    (increase (total-cost)(distance ?l1 ?l2))
+                    (not(taxiAt ?l1))                    
                     (decrease (batteryLevel)(* (distance ?l1 ?l2) (cost-per-distance)))                          
                     (when (congested ?l2)
-                        (increase (total-cost)(* 2 (distance ?l1 ?l2))
+                        (increase (total-cost)(*(distance ?l1 ?l2) 5)
                     ))
+                    (when (not(congested ?l2))
+                        (increase (total-cost)(distance ?l1 ?l2))
+                    )
                 )
     )
     (:action recharge
-        :parameters()
-        :precondition(and (or (taxiAt chargeStation1) (taxiAt chargeStation2))
-                        (< (batteryLevel) 100)
+        :parameters(?l - location)
+        :precondition(and (chargeStation ?l)
+                            (taxiAt ?l)
+                            (< (batteryLevel) 100)
                     )
         :effect(and(assign (batteryLevel) 100)
                     (increase (total-cost) 10)
@@ -66,5 +68,4 @@
                     (not (requestTo ?p ?l))
                 )
     )
-
 )

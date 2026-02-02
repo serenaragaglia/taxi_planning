@@ -17,6 +17,8 @@
             airport - location
             pub - location
             mall - location
+            chargeStation1 - location
+            chargeStation2 - location
 
     ) 
     (:init
@@ -78,8 +80,9 @@
 
         (requestTo p4 airport)
 
+        (chargeStation chargeStation1)
+        (chargeStation chargeStation2)
 
-        
         (= (distance school restaurant) 5)
         (= (distance restaurant school) 5)
         (= (distance school park2) 6)
@@ -121,17 +124,20 @@
         (= (distance mall apartment1) 6)
         (= (distance apartment1 mall) 6)
 
+        (congested apartment1)
+        (congested mall)
+        (congested park2)
+        (congested airport)
+
         (= (cost-per-distance) 2)
   
         (= (batteryLevel) 100)  
         (= (total-cost) 0)
 
     )
-    (:goal (and (passengerAt p1 park2)
-                (passengerAt p2 apartment1)
-                (passengerAt p3 mall)
-                (passengerAt p4 airport)
-        )
+    (:goal (forall (?l - location)
+                    (not(exists (?p - passenger)(requestTo ?p ?l) ))                               
+            )
     )
     (:metric minimize (total-cost))
 )
