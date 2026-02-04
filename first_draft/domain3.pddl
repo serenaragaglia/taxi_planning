@@ -1,11 +1,9 @@
 (define (domain taxi_domain1)
     (:requirements :adl :typing :negative-preconditions :action-costs :disjunctive-preconditions :conditional-effects)
     (:types passenger - object  location - object color )
-    (:constants green red - color)
     (:predicates 
         (road ?l1 ?l2 - location)
         (trafficLight ?l1 ?l2 - location)
-        (lightColor ?c - color ?l1 ?l2 - location)
         (taxiAt ?l - location)
         (passengerAt ?p - passenger ?l - location)
         (requestTo ?p - passenger ?l - location)
@@ -24,31 +22,21 @@
         :parameters (?l1 ?l2 - location)
         :precondition(and(taxiAt ?l1)
                         (road ?l1 ?l2)                           
-                        (> (batteryLevel)(* (distance ?l1 ?l2) (cost-per-distance)))
-                        (or (not(trafficLight ?l1 ?l2))(lightColor green ?l1 ?l2))                                                 
+                        (> (batteryLevel)(* (distance ?l1 ?l2) (cost-per-distance)))                                                 
                     )
         :effect(and(taxiAt ?l2)
                     (not(taxiAt ?l1))                    
                     (decrease (batteryLevel)(* (distance ?l1 ?l2) (cost-per-distance)))                          
                     (when (congested ?l2)
-                        (increase (total-cost)(*(distance ?l1 ?l2) 5)
-                    ))
+                        (increase (total-cost)(*(distance ?l1 ?l2) 5))
+                    )
                     (when (not(congested ?l2))
                         (increase (total-cost)(distance ?l1 ?l2))
                     )
-                    (when (and(trafficLight ?l1 ?l2)(lightColor green ?l1 ?l2)) 
-                            (and(lightColor red ?l1 ?l2)(not(lightColor green ?l1 ?l2)))
+                    (when (trafficLight ?l1 ?l2) 
+                        (increase (total-cost)(*(distance ?l1 ?l2) 3))
                     )
                 )
-    )
-
-    (:action switchLight 
-        :parameters (?l1 ?l2 - location)
-        :precondition (and (trafficLight ?l1 ?l2) (lightColor red ?l1 ?l2))
-        :effect (and 
-                    (lightColor green ?l1 ?l2) 
-                    (not(lightColor red ?l1 ?l2))
-                    (increase (total-cost) 3))
     )
 
     (:action recharge
@@ -59,8 +47,7 @@
                     )
         :effect(and(assign (batteryLevel) 100)
                     (increase (total-cost) 10)
-        )
-                
+        )                
     )
     (:action pickUp
         :parameters(?p - passenger ?l - location)   
