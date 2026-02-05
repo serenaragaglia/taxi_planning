@@ -5,8 +5,7 @@
             p2 - passenger
             p3 - passenger
             p4 - passenger
-            p5 - passenger
-            p6 - passenger
+
             school - location
             restaurant - location
             bank - location
@@ -19,20 +18,9 @@
             airport - location
             pub - location
             mall - location
-
-            museum - location
-            library - location
-            college - location
-            office2 - location
-            groceryStore - location
-            bookstore - location
-            gym - location
-            cinema - location
-            theater - location          
             
             chargeStation1 - location
             chargeStation2 - location
-            chargeStation3 - location
 
     ) 
     (:init
@@ -80,59 +68,31 @@
         (road mall apartment1)
         (road apartment1 mall)
 
-        (road park1 groceryStore)
-        (road groceryStore park1)
-        (road groceryStore theater)
-        (road theater groceryStore)
-        (road groceryStore park1)
-        (road park1 groceryStore)
-        (road theater office2)
-        (road office2 theater)
-        (road gym office2)
-        (road office2 gym)
-        (road gym hotel)
-        (road hotel gym)
-        (road mall library)
-        (road library mall)
-        (road library college)
-        (road college library)
-        (road college museum)
-        (road museum college)
-        (road college chargeStation3)
-        (road chargeStation3 college)
-        (road museum chargeStation1)
-        (road chargeStation1 museum)
-        (road mall museum)
-        (road museum mall)
-        (road cinema chargeStation1)
-        (road chargeStation1 cinema)
-        (road cinema bookstore)
-        (road bookstore cinema)
-        (road bookstore airport)
-        (road airport bookstore)
+
+
+
 
     ;;passengers' location
         (passengerAt p1 restaurant)
-        (passengerAt p2 school)
+        (passengerAt p2 pub)
         (passengerAt p3 apartment2)
-        (passengerAt p4 park1)
-        (passengerAt p5 gym)
-        (passengerAt p6 library)
+        (passengerAt p4 school)
+
         (taxiAt office1)
         
     ;;passengers' requests
         (requestTo p1 park2)
 
-        (requestTo p2 apartment1)    
+        (requestTo p2 hotel)    
 
         (requestTo p3 mall)
 
-        (requestTo p6 cinema)  
+        (requestTo p4 apartment1)
+
 
     ;;charge stations defintion
         (chargeStation chargeStation1)
         (chargeStation chargeStation2)
-        (chargeStation chargeStation3)
 
     ;;distances definitions
         (= (distance school restaurant) 5)
@@ -174,52 +134,16 @@
         (= (distance pub mall) 4)
         (= (distance mall apartment1) 6)
         (= (distance apartment1 mall) 6)
-        (= (distance park1 groceryStore) 5)
-        (= (distance groceryStore park1) 5)
-        (= (distance groceryStore theater) 4)
-        (= (distance theater groceryStore) 4)
-
-        (= (distance groceryStore hotel) 1)
-        (= (distance hotel groceryStore) 1)
-
-        (= (distance theater office2) 6)
-        (= (distance office2 theater) 6)
-        (= (distance gym office2) 3)
-        (= (distance office2 gym) 3)
-        (= (distance gym hotel) 4)
-        (= (distance hotel gym) 4)
-        (= (distance mall library) 5)
-        (= (distance library mall) 5)
-        (= (distance library college) 2)
-        (= (distance college library) 2)
-        (= (distance college museum) 7)
-        (= (distance museum college) 7)
-        (= (distance college chargeStation3) 8)
-        (= (distance chargeStation3 college) 8)
-        (= (distance museum chargeStation1) 4)
-        (= (distance chargeStation1 museum) 4)
-        (= (distance mall museum) 6)
-        (= (distance museum mall) 6)
-        (= (distance cinema chargeStation1) 5)
-        (= (distance chargeStation1 cinema) 5)
-        (= (distance cinema bookstore) 4)
-        (= (distance bookstore cinema) 4)
-        (= (distance bookstore airport) 7)
-        (= (distance airport bookstore) 7)
 
     ;;congested locations
         (congested apartment1)
         (congested mall)
         (congested park2)
         (congested airport)
-        (congested museum)
-        (congested groceryStore)
-        (congested pub)
+        
+
     
     ;;traffic lights definition
-        (trafficLight apartment1 office1)
-        (trafficLight office1 apartment1)
-
         ;(trafficLight park2 office1)
         ;(trafficLight office1 park2)
 
@@ -232,21 +156,17 @@
         (trafficLight pub mall)
         (trafficLight mall pub)
 
-        (trafficLight hotel gym)
-        (trafficLight gym hotel)
 
         (trafficLight restaurant bank)
         (trafficLight bank restaurant)
     
     ;;traffic lights color
-        (lightColor red apartment1 office1)
-        (lightColor red office1 apartment1)
 
-        (lightColor red park2 office1)
-        (lightColor red office1 park2)
+        ;;(lightColor red park2 office1)
+        ;;(lightColor red office1 park2)
 
-        (lightColor red bank office1)
-        (lightColor red office1 bank)
+        ;;(lightColor red bank office1)
+        ;;(lightColor red office1 bank)
 
         (lightColor red park1 office1)
         (lightColor red office1 park1)
@@ -255,8 +175,6 @@
         (lightColor red pub mall)
         (lightColor red mall pub)
 
-        (lightColor red hotel gym)
-        (lightColor red gym hotel)
 
         (lightColor red restaurant bank)
         (lightColor red bank restaurant)

@@ -1,0 +1,134 @@
+Domain parsed
+Problem parsed
+Grounding..
+Grounding Time: 89
+Aibr Preprocessing
+|F|:106
+|X|:1
+|A|:58
+|P|:0
+|E|:0
+H1 Setup Time (msec): 16
+ g(n)= 3.0 h(n)=84.0
+-------------Time: 10s ; Expanded Nodes: 159644 (Avg-Speed 15964.0 n/s); Evaluated States: 288605
+-------------Time: 20s ; Expanded Nodes: 324435 (Avg-Speed 16221.0 n/s); Evaluated States: 576663
+-------------Time: 30s ; Expanded Nodes: 503747 (Avg-Speed 16791.0 n/s); Evaluated States: 877606
+-------------Time: 40s ; Expanded Nodes: 689595 (Avg-Speed 17239.0 n/s); Evaluated States: 1177080
+-------------Time: 50s ; Expanded Nodes: 881872 (Avg-Speed 17637.0 n/s); Evaluated States: 1473863
+-------------Time: 60s ; Expanded Nodes: 1093120 (Avg-Speed 18218.0 n/s); Evaluated States: 1766033
+-------------Time: 70s ; Expanded Nodes: 1278981 (Avg-Speed 18271.0 n/s); Evaluated States: 2053320
+-------------Time: 80s ; Expanded Nodes: 1483664 (Avg-Speed 18545.0 n/s); Evaluated States: 2352824
+-------------Time: 90s ; Expanded Nodes: 1674418 (Avg-Speed 18604.0 n/s); Evaluated States: 2654894
+-------------Time: 100s ; Expanded Nodes: 1879528 (Avg-Speed 18795.0 n/s); Evaluated States: 2957958
+-------------Time: 110s ; Expanded Nodes: 2098207 (Avg-Speed 19074.0 n/s); Evaluated States: 3255026
+-------------Time: 120s ; Expanded Nodes: 2305027 (Avg-Speed 19208.0 n/s); Evaluated States: 3556161
+-------------Time: 130s ; Expanded Nodes: 2494468 (Avg-Speed 19188.0 n/s); Evaluated States: 3851683
+-------------Time: 140s ; Expanded Nodes: 2708194 (Avg-Speed 19344.0 n/s); Evaluated States: 4154115
+-------------Time: 150s ; Expanded Nodes: 2894495 (Avg-Speed 19296.0 n/s); Evaluated States: 4450152
+-------------Time: 160s ; Expanded Nodes: 3094332 (Avg-Speed 19339.0 n/s); Evaluated States: 4753895
+-------------Time: 170s ; Expanded Nodes: 3300126 (Avg-Speed 19412.0 n/s); Evaluated States: 5055637
+-------------Time: 180s ; Expanded Nodes: 3511846 (Avg-Speed 19510.0 n/s); Evaluated States: 5356932
+-------------Time: 190s ; Expanded Nodes: 3726949 (Avg-Speed 19615.0 n/s); Evaluated States: 5659696
+-------------Time: 200s ; Expanded Nodes: 3922723 (Avg-Speed 19613.0 n/s); Evaluated States: 5922994
+-------------Time: 210s ; Expanded Nodes: 4117553 (Avg-Speed 19607.0 n/s); Evaluated States: 6188138
+-------------Time: 220s ; Expanded Nodes: 4331582 (Avg-Speed 19689.0 n/s); Evaluated States: 6460353
+-------------Time: 230s ; Expanded Nodes: 4545886 (Avg-Speed 19764.0 n/s); Evaluated States: 6725033
+-------------Time: 240s ; Expanded Nodes: 4775922 (Avg-Speed 19899.0 n/s); Evaluated States: 7005012
+ g(n)= 686.0 h(n)=60.0
+ g(n)= 1273.0 h(n)=48.0
+ g(n)= 1430.0 h(n)=36.0
+ g(n)= 1616.0 h(n)=0.0
+Problem Solved
+
+Found Plan:
+0.0: (move office1 park2)
+1.0: (move park2 school)
+2.0: (pickUp p4 school)
+3.0: (move school park2)
+4.0: (move park2 office1)
+5.0: (move office1 apartment1)
+6.0: (getOff p4 apartment1)
+7.0: (move apartment1 office1)
+8.0: (move office1 park2)
+9.0: (move park2 chargeStation1)
+10.0: (move chargeStation1 pub)
+11.0: (pickUp p2 pub)
+12.0: (move pub chargeStation1)
+13.0: (recharge chargeStation1)
+14.0: (move chargeStation1 park2)
+15.0: (move park2 office1)
+16.0: (move office1 apartment1)
+17.0: (move apartment1 hotel)
+18.0: (getOff p2 hotel)
+19.0: (move hotel chargeStation2)
+20.0: (recharge chargeStation2)
+21.0: (move chargeStation2 park1)
+22.0: (move park1 restaurant)
+23.0: (move restaurant apartment2)
+24.0: (move apartment2 restaurant)
+25.0: (switchLight park1 office1)
+26.0: (switchLight restaurant bank)
+27.0: (switchLight office1 park1)
+28.0: (switchLight mall pub)
+29.0: (switchLight pub mall)
+30.0: (switchLight bank restaurant)
+31.0: (move restaurant apartment2)
+32.0: (pickUp p3 apartment2)
+33.0: (move apartment2 restaurant)
+34.0: (move restaurant school)
+35.0: (move school park2)
+36.0: (move park2 chargeStation1)
+37.0: (recharge chargeStation1)
+38.0: (move chargeStation1 park2)
+39.0: (move park2 office1)
+40.0: (move office1 apartment1)
+41.0: (move apartment1 mall)
+42.0: (move mall pub)
+43.0: (move pub chargeStation1)
+44.0: (move chargeStation1 park2)
+45.0: (move park2 office1)
+46.0: (move office1 park1)
+47.0: (switchLight office1 park1)
+48.0: (move park1 chargeStation2)
+49.0: (recharge chargeStation2)
+50.0: (move chargeStation2 hotel)
+51.0: (move hotel apartment1)
+52.0: (move apartment1 office1)
+53.0: (move office1 park2)
+54.0: (move park2 chargeStation1)
+55.0: (move chargeStation1 park2)
+56.0: (move park2 chargeStation1)
+57.0: (move chargeStation1 pub)
+58.0: (move pub mall)
+59.0: (getOff p3 mall)
+60.0: (move mall apartment1)
+61.0: (switchLight pub mall)
+62.0: (move apartment1 hotel)
+63.0: (move hotel chargeStation2)
+64.0: (recharge chargeStation2)
+65.0: (move chargeStation2 park1)
+66.0: (move park1 office1)
+67.0: (switchLight park1 office1)
+68.0: (move office1 park1)
+69.0: (move park1 office1)
+70.0: (switchLight park1 office1)
+71.0: (move office1 park2)
+72.0: (move park2 office1)
+73.0: (switchLight office1 park1)
+74.0: (switchLight mall pub)
+75.0: (move office1 park1)
+76.0: (move park1 restaurant)
+77.0: (pickUp p1 restaurant)
+78.0: (move restaurant school)
+79.0: (move school park2)
+80.0: (getOff p1 park2)
+
+Plan-Length:81
+Metric (Search):1616.0
+Planning Time (msec): 246549
+Heuristic Time (msec): 206881
+Search Time (msec): 246544
+Expanded Nodes:4910931
+States Evaluated:7168511
+Number of Dead-Ends detected:1677288
+Number of Duplicates detected:21072018
