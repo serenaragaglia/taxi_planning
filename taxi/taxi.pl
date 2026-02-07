@@ -3,6 +3,7 @@
     fun_fluent/1,
     rel_fluent/1,
     proc/2,
+    causes_val
     causes_true/3,
     causes_false/3.
 
@@ -30,13 +31,7 @@ passenger(p2).
 passenger(p3).
 passenger(p4).
 
-charge_station(chargeStation1).
-charge_station(chargeStation2).
-
 %% STATIC RELATIONS
-
-road(L1,L2).
-distance(L1,L2,D).
 
 cost_per_distance(2).
 
@@ -81,8 +76,8 @@ road(pub, mall).
 road(mall, apartment1).
 road(apartment1, mall).
 
-chargeStation(chargeStation1).
-chargeStation(chargeStation2).
+charge_station(chargeStation1).
+charge_station(chargeStation2).
 
 congested(apartment1).
 congested(mall).
@@ -130,30 +125,29 @@ distance(pub, mall, 4).
 distance(mall, apartment1, 6).
 distance(apartment1, mall, 6).
 
-cost_per_distance(2).
-
+execute(A, SR) :- ask_execute(A, SR).
+exog_occurs(_) :- fail.
 %% FLUENTS
 
-rel_fluent(taxi_at(L)) :- location(L).
-rel_fluent(passenger_at(P,L)) :- passenger(P), location(L).
-rel_fluent(on_taxi(P)) :- passenger(P).
-rel_fluent(request_to(P,L)) :- passenger(P), location(L).
+prim_fluent(taxi_at(L)) :- location(L).
+prim_fluent(passenger_at(P,L)) :- passenger(P), location(L).
+prim_fluent(on_taxi(P)) :- passenger(P).
+prim_fluent(request_to(P,L)) :- passenger(P), location(L).
 
 fun_fluent(battery_level).
 fun_fluent(total_cost).
 
 %% TRAFFIC LIGHT FLUENTS
 
-rel_fluent(light_green(L)) :- location(L).
-rel_fluent(light_red(L)) :- location(L).
+prim_fluent(light_green(L)) :- location(L).
+prim_fluent(light_red(L)) :- location(L).
 
 %% ACTIONS
 
 prim_action(move(L1,L2)) :- location(L1), location(L2).
 prim_action(pickup(P,L)) :- passenger(P), location(L).
-prim_action(dropoff(P,L)) :- passenger(P), location(L).
+prim_action(getOff(P,L)) :- passenger(P), location(L).
 prim_action(recharge(L)) :- location(L).
-% `toggle_light/1` is exogenous and therefore not declared as a prim_action here.
 
 %% ACTION PRECONDITIONS
 
@@ -173,7 +167,7 @@ poss(pickup(P,L), (
     \+ on_taxi(_)
 )).
 
-poss(dropoff(P,L), (
+poss(getOff(P,L), (
     on_taxi(P),
     taxi_at(L),
     request_to(P,L)
@@ -186,34 +180,22 @@ poss(recharge(L), (
     B < 100
 )).
 
-% Exogenous action declaration for traffic-light toggles
-exog_action(toggle_light(L)) :- location(L).
+/*Successor state axioms*/
+causes_val(move(_,L2), taxi_at(L2), true, true).
+causes_val(move(L1,_), taxi_at(L1), false, true).
 
-% Treat exogenous actions as primitive for the executor and give them
-% an unconditional precondition (they can occur at any time).
-prim_action(Act) :- exog_action(Act).
-poss(Act, true) :- exog_action(Act).
+causes_val(pickup(P,_), on_taxi(P), true, true).
+causes_val(pickup(P,L), passenger_at(P,L), false, true).
 
-%% CAUSAL LAWS
+causes_val(getOff(P,_), on_taxi(P), false, true).
+causes_val(getOff(P,L), passenger_at(P,L), true, true).
 
-% --- taxi position
-causes_true(move(_,L2), taxi_at(L2), true).
-causes_false(move(L1,_), taxi_at(L1), true).
-
-% --- passenger boarding
-causes_true(pickup(P,_), on_taxi(P), true).
-causes_false(dropoff(P,_), on_taxi(P), true).
-
-causes_false(pickup(P,L), passenger_at(P,L), true).
-causes_true(dropoff(P,L), passenger_at(P,L), true).
-
-% --- request satisfied
-causes_false(dropoff(P,L), request_to(P,L), true).
+causes_val(getOff(P,L), request_to(P,L), false, true).
 
 % --- battery
-causes_true(recharge(_), battery_level(100), true).
+causes_val(recharge(_), battery_level, 100, true).
 
-causes_true(move(L1,L2), battery_level(B2),
+causes_val(move(L1,L2), battery_level, B2,
     ( battery_level(B1),
       distance(L1,L2,D),
       cost_per_distance(C),
@@ -221,27 +203,11 @@ causes_true(move(L1,L2), battery_level(B2),
 ).
 
 % --- cost
-causes_true(move(L1,L2), total_cost(C2),
+causes_val(move(L1,L2), total_cost, C2,
     ( total_cost(C1),
       distance(L1,L2,D),
       cost_per_distance(C),
       C2 is C1 + D * C )
-).
-
-% --- traffic lights (exogenous)
-% toggle_light flips a light from red to green or green to red
-causes_true(toggle_light(L), light_green(L),
-    ( light_red(L) )
-).
-causes_false(toggle_light(L), light_red(L),
-    ( light_red(L) )
-).
-
-causes_true(toggle_light(L), light_red(L),
-    ( light_green(L) )
-).
-causes_false(toggle_light(L), light_green(L),
-    ( light_green(L) )
 ).
 
 %% INITIAL STATE
@@ -264,43 +230,31 @@ initially(battery_level(100), true).
 initially(total_cost(0), true).
 initially(light_green(L), true) :- location(L).
 
-%% GOAL
+/*proc(goTo(L), move(_,L)).
+proc(pickUpPassenger(P,L), [goToL(L), pickup(P,L)]).
+proc(dropOffPassenger(P,L), [goToL(L), getOff(P,L)]).
+proc(recharge, ?(taxi_at(L), charge_station(L)), recharge(L)).*/
 
-goal(neg(some(P,L, request_to(P,L)))).
+proc(go_to_destination(L), while(neg(taxi_at(L)), pi(To, [?taxi_at(From), road(From, To), move(From, To)]))).
+proc(serve_passenger(P, L1, L2), [pickup(P, L1), go_to_destination(L2), getOff(P, L2)]).
+proc(serve_some_passenger,
+    pi(P,
+        [?request_to(P,L2),
+         ?passenger_at(P,L1),
+         serve_passenger(P,L1,L2)])).
 
-%% COMPLEX ACTIONS
+proc(recharge_battery,
+    pi(L,
+        [charge_station(L),
+         go_to_destination(L),
+         recharge(L)])).
 
-proc(pi_move,
-    pi([l1,l2], move(l1,l2))
-).
+proc(serve_battery_aware,
+    [serve_some_passenger,
+     if((?battery_level(B), B < 25), recharge_battery, true)]).
 
-proc(pi_pickup,
-    pi([p,l], pickup(p,l))
-).
-
-proc(pi_dropoff,
-    pi([p,l], dropoff(p,l))
-).
-
-proc(pi_recharge,
-    pi(l, recharge(l))
-).
-
-proc(choose_action,
-    ndet(
-        ndet(pi_move, pi_pickup),
-        ndet(pi_dropoff, pi_recharge)
-    )
-).
-
-%% CONTROLLERS
-proc(control(full_search), search(full_search)).
-
-proc(full_search, [
-    star(choose_action),
-    ?(goal)
+proc(control(basic),
+[
+    while(some(p, request_to(p, _)), serve_battery_aware),
+    go_to_destination(office)
 ]).
-
-%% EXECUTOR INFO
-
-actionNum(X,X).
