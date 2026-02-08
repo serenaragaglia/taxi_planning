@@ -11,12 +11,13 @@ cache(_) :- fail.
 
 %% DOMAIN OBJECTS
 
+
 location(school).
 location(restaurant).
 location(park1).
 location(park2).
 location(bank).
-location(office).
+location(office1).
 location(apartment1).
 location(apartment2).
 location(airport).
@@ -45,16 +46,16 @@ road(restaurant, bank).
 road(bank, restaurant).
 road(bank, park2).
 road(park2, bank).
-road(bank, office).
-road(office, bank).
-road(office, park2).
-road(park2, office).
-road(office, park1).
-road(park1, office).
+road(bank, office1).
+road(office1, bank).
+road(office1, park2).
+road(park2, office1).
+road(office1, park1).
+road(park1, office1).
 road(park2, chargeStation1).
 road(chargeStation1, park2).
-road(office, apartment1).
-road(apartment1, office).
+road(office1, apartment1).
+road(apartment1, office1).
 road(restaurant, apartment2).
 road(apartment2, restaurant).
 road(apartment2, pub).
@@ -76,13 +77,6 @@ road(pub, mall).
 road(mall, apartment1).
 road(apartment1, mall).
 
-charge_station(chargeStation1).
-charge_station(chargeStation2).
-
-congested(apartment1).
-congested(mall).
-congested(park2).
-congested(airport).
 
 distance(school, restaurant, 5).
 distance(restaurant, school, 5).
@@ -94,20 +88,18 @@ distance(restaurant, bank, 5).
 distance(bank, restaurant, 5).
 distance(bank, park2, 6).
 distance(park2, bank, 6).
-distance(bank, office, 8).
-distance(office, bank, 8).
-distance(office, park2, 5).
-distance(park2, office, 5).
-distance(office, park1, 4).
-distance(park1, office, 4).
+distance(bank, office1, 8).
+distance(office1, bank, 8).
+distance(office1, park2, 5).
+distance(park2, office1, 5).
+distance(office1, park1, 4).
+distance(park1, office1, 4).
 distance(park2, chargeStation1, 3).
 distance(chargeStation1, park2, 3).
-distance(office, apartment1, 4).
-distance(apartment1, office, 4).
+distance(office1, apartment1, 4).
+distance(apartment1, office1, 4).
 distance(restaurant, apartment2, 6).
 distance(apartment2, restaurant, 6).
-distance(apartment2, pub, 2).
-distance(pub, apartment2, 2).
 distance(apartment1, hotel, 5).
 distance(hotel, apartment1, 5).
 distance(hotel, chargeStation2, 4).
@@ -124,128 +116,150 @@ distance(mall, pub, 4).
 distance(pub, mall, 4).
 distance(mall, apartment1, 6).
 distance(apartment1, mall, 6).
+distance(apartment2, pub, 2).
+distance(pub, apartment2, 2).
+
+charge_station(chargeStation1).
+charge_station(chargeStation2).
+
+congested(apartment1).
+congested(mall).
+congested(park2).
+congested(airport).
+
+
+/* FLUENTS  and  CAUSAL LAWS */
+
+% taxi_at
+rel_fluent(taxi_at(L)) :- location(L).
+causes_true(move(_, L2),  taxi_at(L2), true).
+causes_false(move(L1, _), taxi_at(L1), true).
+
+% passenger_at
+rel_fluent(passenger_at(P, L)) :- passenger(P), location(L).
+causes_false(pickUp(P, L), passenger_at(P, L), true).
+causes_true(getOff(P, L), passenger_at(P, L), true).
+
+% on_taxi
+rel_fluent(on_taxi(P)) :- passenger(P).
+causes_true(pickUp(P, _),  on_taxi(P), true).
+causes_false(getOff(P, _), on_taxi(P), true).
+
+% request_to
+rel_fluent(request_to(P, L)) :- passenger(P), location(L).
+causes_false(getOff(P, L), request_to(P, L), true).
+causes_true(pickUp(P, _), request_to(P, _), true).
+
+% battery_level
+fun_fluent(battery_level).
+causes_val(recharge(_), battery_level, 100, true).
+causes_val(move(L1, L2), battery_level, B2,
+    and(battery_level = B1,
+    and(distance(L1, L2, D),
+    and(cost_per_distance(C),
+        B2 is B1 - D * C)))).
+
+% total_cost
+fun_fluent(total_cost).
+causes_val(move(L1, L2), total_cost, C2,
+    and(congested(L2),
+    and(total_cost = C1,
+    and(distance(L1, L2, D),
+        C2 is C1 + D * 5)))).
+causes_val(move(L1, L2), total_cost, C2,
+    and(neg(congested(L2)),
+    and(total_cost = C1,
+    and(distance(L1, L2, D),
+        C2 is C1 + D)))).
+causes_val(recharge(_), total_cost, C2,
+    and(total_cost = C1, C2 is C1 + 10)).
+
+/* ACTIONS and PRECONDITIONS*/
+
+prim_action(move(L1, L2)) :- location(L1), location(L2).
+poss(move(L1, L2),
+    and(taxi_at(L1),
+    and(road(L1, L2),
+    (battery_level > (D * C)))
+    )) :- distance(L1, L2, D), cost_per_distance(C).
+
+
+prim_action(recharge(L)) :- location(L).
+poss(recharge(L),
+    and(charge_station(L),
+    and(taxi_at(L),
+        battery_level < 100))).
+
+prim_action(pickUp(P, L)) :- passenger(P), location(L).
+poss(pickUp(P, L),
+    and(passenger_at(P, L),
+    and(taxi_at(L),
+    and(some(l, request_to(P, l)),
+        neg(some(q, on_taxi(q))))))).
+
+prim_action(getOff(P, L)) :- passenger(P), location(L).
+poss(getOff(P, L),
+    and(on_taxi(P),
+    and(taxi_at(L),
+        request_to(P, L)))).
 
 execute(A, SR) :- ask_execute(A, SR).
 exog_occurs(_) :- fail.
-/* FLUENTS */
 
-rel_fluent(taxi_at(L)) :- location(L).
-causes_val(move(_,L2), taxi_at(L2), true, true).
-causes_val(move(L1,_), taxi_at(L1), false, true).
+/* INITIAL STATE */
 
-
-rel_fluent(passenger_at(P,L)) :- passenger(P), location(L).
-rel_fluent(on_taxi(P)) :- passenger(P).
-rel_fluent(request_to(P,L)) :- passenger(P), location(L).
-
-fun_fluent(battery_level).
-fun_fluent(total_cost).
-
-/* relational fluent declarations (boolean fluents) */
-%% TRAFFIC LIGHT FLUENTS
-
-%% ACTIONS
-
-prim_action(move(L1,L2)) :- location(L1), location(L2).
-prim_action(pickup(P,L)) :- passenger(P), location(L).
-prim_action(getOff(P,L)) :- passenger(P), location(L).
-prim_action(recharge(L)) :- location(L).
-
-%% ACTION PRECONDITIONS
-
-poss(move(L1,L2), and(
-    taxi_at(L1),
-    road(L1,L2)
-    /* battery_level(B),
-    distance(L1,L2,D),
-    cost_per_distance(C),
-    B >= D * C */
-)).
-
-poss(pickup(P,L), and(
-    taxi_at(L),
-    passenger_at(P,L),
-    request_to(P,_),
-    \+ on_taxi(_)
-)).
-
-poss(getOff(P,L), and(
-    on_taxi(P),
-    taxi_at(L),
-    request_to(P,L)
-)).
-
-poss(recharge(L), and(
-    taxi_at(L),
-    charge_station(L),
-    battery_level(B),
-    B < 100
-)).
-
-/*Successor state axioms*/
-
-causes_val(pickup(P,_), on_taxi(P), true, true).
-causes_val(pickup(P,L), passenger_at(P,L), false, true).
-
-causes_val(getOff(P,_), on_taxi(P), false, true).
-causes_val(getOff(P,L), passenger_at(P,L), true, true).
-
-causes_val(getOff(P,L), request_to(P,L), false, true).
-
-% --- battery
-causes_val(recharge(_), battery_level, 100, true).
-
-causes_val(move(L1,L2), battery_level, B2,
-    ( battery_level(B1),
-      distance(L1,L2,D),
-      cost_per_distance(C),
-      B2 is B1 - D * C )
-).
-
-% --- cost
-causes_val(move(L1,L2), total_cost, C2,
-    ( total_cost(C1),
-      distance(L1,L2,D),
-      cost_per_distance(C),
-      C2 is C1 + D * C )
-).
-
-%% INITIAL STATE
-
-initially(taxi_at(office), true).
+initially(taxi_at(office1), true).
+initially(taxi_at(L), false) :- location(L), L \= office1.
 
 initially(passenger_at(p1, restaurant), true).
-initially(passenger_at(p2, school), true).
+initially(passenger_at(p2, pub), true).
 initially(passenger_at(p3, apartment2), true).
-initially(passenger_at(p4, park1), true).
+initially(passenger_at(p4, school), true).
+initially(passenger_at(P, L), false) :-
+    passenger(P), location(L), \+ initially(passenger_at(P, L), true).
 
 initially(request_to(p1, park2), true).
-initially(request_to(p2, apartment1), true).
+initially(request_to(p2, hotel), true).
 initially(request_to(p3, mall), true).
-initially(request_to(p4, airport), true).
+initially(request_to(p4, apartment1), true).
+initially(request_to(P, L), false) :-
+    passenger(P), location(L), \+ initially(request_to(P, L), true).
 
 initially(on_taxi(P), false) :- passenger(P).
-
 initially(battery_level, 100).
 initially(total_cost, 0).
-initially(light_green(L), true) :- location(L).
+proc(some_pending, some(p, some(l, request_to(p, l)))).
+proc(pending_passenger(P), some(l, request_to(P, l))).
 
-/*proc(goTo(L), move(_,L)).
-proc(pickUpPassenger(P,L), [goToL(L), pickup(P,L)]).
-proc(dropOffPassenger(P,L), [goToL(L), getOff(P,L)]).
-proc(recharge, ?(taxi_at(L), charge_station(L)), recharge(L)).*/
 
-proc(go_to_destination(L), while(neg(taxi_at(L)), pi(To, [taxi_at(From), road(From, To), move(From, To)]))).
-proc(serve_passenger(P, L1, L2), [pickup(P, L1), go_to_destination(L2), getOff(P, L2)]).
+
+/* COMPLEX ACTIONS */
+
+
+proc(go_to_destination(L),
+    while(neg(taxi_at(L)),
+        pi(from,
+        pi(to,
+            [?(taxi_at(from)),
+             ?(road(from, to)),
+             move(from, to)])))).
+
+proc(serve_passenger(P, Src, Dst),
+    [go_to_destination(Src),
+     pickUp(P, Src),
+     go_to_destination(Dst),
+     getOff(P, Dst)]).
+
 proc(serve_some_passenger,
-    pi(P,
-        [request_to(P,L2),
-         passenger_at(P,L1),
-         serve_passenger(P,L1,L2)])).
+    pi(p,
+        [?(pending_passenger(p)),
+         pi(src, [?(passenger_at(p, src)),
+         pi(dst, [?(request_to(p, dst)),
+                   serve_passenger(p, src, dst)])])])).
 
 proc(recharge_battery,
     pi(L,
-        [charge_station(L),
+        [?(charge_station(L)),
          go_to_destination(L),
          recharge(L)])).
 
@@ -253,8 +267,11 @@ proc(serve_battery_aware,
     [serve_some_passenger,
      if((battery_level(B), B < 25), recharge_battery, true)]).
 
+/*CONTROLLERS*/
+
 proc(control(basic),
 [
-    while(some(p, request_to(p, _)), serve_some_passenger),
-    go_to_destination(office) 
-]).
+        while(some_pending, serve_some_passenger),
+     go_to_destination(office1)]).
+
+actionNum(X, X).
