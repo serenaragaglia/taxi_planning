@@ -104,7 +104,7 @@ main(C) :-
 
 :- set_option(log_level, 5).
 :- set_option(log_level, em(1)).
-:- set_option(wait_step, 10).
+:- set_option(wait_step, 1).
 
 legality_task :-
 	format("Write the sequence of actions '[a1(), ..., an()].' :\n"),

@@ -1,0 +1,206 @@
+:- dynamic controller/1.
+:- discontiguous
+    fun_fluent/1,
+    rel_fluent/1,
+    proc/2,
+    causes_val/4,
+    causes_true/3,
+    causes_false/3.
+
+cache(_) :- fail.
+
+%% DOMAIN OBJECTS
+
+
+location(school).
+location(restaurant).
+location(park1).
+location(park2).
+location(bank).
+passenger(p1).
+passenger(p2).
+passenger(p3).
+passenger(p4).
+
+%% STATIC RELATIONS
+
+cost_per_distance(0).
+
+road(school, restaurant).
+road(restaurant, school).
+road(school, park2).
+road(park2, school).
+
+road(restaurant, park1).
+road(park1, restaurant).
+road(restaurant, bank).
+road(bank, restaurant).
+
+distance(school, restaurant, 5).
+distance(restaurant, school, 5).
+distance(school, park2, 6).
+distance(park2, school, 6).
+distance(restaurant, park1, 4).
+distance(park1, restaurant, 4).
+distance(restaurant, bank, 5).
+distance(bank, restaurant, 5).
+
+charge_station(chargeStation1).
+charge_station(chargeStation2).
+
+congested(apartment1).
+congested(mall).
+congested(park2).
+congested(airport).
+
+
+/* FLUENTS  and  CAUSAL LAWS */
+
+% taxi_at
+rel_fluent(taxi_at(L)) :- location(L).
+causes_true(move(_, L2),  taxi_at(L2), true).
+causes_false(move(L1, _), taxi_at(L1), true).
+
+% passenger_at
+rel_fluent(passenger_at(P, L)) :- passenger(P), location(L).
+causes_false(pickUp(P, L), passenger_at(P, L), true).
+causes_true(getOff(P, L), passenger_at(P, L), true).
+
+% on_taxi
+rel_fluent(on_taxi(P)) :- passenger(P).
+causes_true(pickUp(P, _),  on_taxi(P), true).
+causes_false(getOff(P, _), on_taxi(P), true).
+
+
+% Last position in which the agent was.
+rel_fluent(last_at(L)) :- location(L).
+causes_true(move(L1,_L2), last_at(L1), true).
+causes_false(move(L1,_L2), last_at(X), X \= L1).
+
+% request_to
+rel_fluent(request_to(P, L)) :- passenger(P), location(L).
+causes_false(getOff(P, L), request_to(P, L), true).
+causes_true(pickUp(P, _), request_to(P, _), true).
+
+% battery_level
+fun_fluent(battery_level).
+causes_val(recharge(_), battery_level, 100, true).
+causes_val(move(L1, L2), battery_level, B2,
+    and(battery_level = B1,
+    and(distance(L1, L2, D),
+    and(cost_per_distance(C),
+        B2 is B1 - D * C)))).
+
+% total_cost
+fun_fluent(total_cost).
+causes_val(move(L1, L2), total_cost, C2,
+    and(congested(L2),
+    and(total_cost = C1,
+    and(distance(L1, L2, D),
+        C2 is C1 + D * 5)))).
+causes_val(move(L1, L2), total_cost, C2,
+    and(neg(congested(L2)),
+    and(total_cost = C1,
+    and(distance(L1, L2, D),
+        C2 is C1 + D)))).
+causes_val(recharge(_), total_cost, C2,
+    and(total_cost = C1, C2 is C1 + 10)).
+
+/* ACTIONS and PRECONDITIONS*/
+
+prim_action(move(L1, L2)) :- location(L1), location(L2).
+poss(move(L1, L2),
+    and(taxi_at(L1),
+    and(road(L1, L2),
+    (battery_level > (D * C)))
+    )) :- distance(L1, L2, D), cost_per_distance(C).
+
+
+prim_action(recharge(L)) :- location(L).
+poss(recharge(L),
+    and(charge_station(L),
+    and(taxi_at(L),
+        battery_level < 100))).
+
+prim_action(pickUp(P, L)) :- passenger(P), location(L).
+poss(pickUp(P, L),
+    and(passenger_at(P, L),
+    and(taxi_at(L),
+    and(some(l, request_to(P, l)),
+        neg(some(j, on_taxi(j))))))).
+
+prim_action(getOff(P, L)) :- passenger(P), location(L).
+poss(getOff(P, L),
+    and(on_taxi(P),
+    and(taxi_at(L),
+        request_to(P, L)))).
+
+execute(A, SR) :- ask_execute(A, SR).
+exog_occurs(_) :- fail.
+
+/* INITIAL STATE */
+
+initially(taxi_at(school), true).
+initially(taxi_at(L), false) :- location(L), L \= school.
+
+initially(passenger_at(p1, restaurant), true).
+initially(passenger_at(P, L), false) :-
+    passenger(P), location(L), \+ initially(passenger_at(P, L), true).
+
+initially(request_to(p1, park2), true).
+initially(request_to(P, L), false) :-
+    passenger(P), location(L), \+ initially(request_to(P, L), true).
+
+initially(on_taxi(P), false) :- passenger(P).
+initially(battery_level, 100).
+initially(total_cost, 0).
+proc(some_pending, some(p, some(l, request_to(p, l)))).
+proc(pending_passenger(P), some(l, request_to(P, l))).
+
+
+
+/* COMPLEX ACTIONS */
+
+
+proc(go_somewhere,
+  pi(l1, [
+    ?(taxi_at(l1)),
+    pi(l2, [
+      ?(road(l1,l2)),
+      ?(neg(last_at(l2))),
+      move(l1, l2)
+    ])
+  ])
+).
+proc(serve_passenger(P, L1, L2),
+    [go_somewhere]).
+
+% safe_move: only execute move(L1,L2) if taxi is currently at L1
+proc(safe_move(L1, L2), [?(taxi_at(L1)), move(L1, L2)]) :-
+    location(L1), location(L2).
+
+proc(serve_some_passenger,
+    pi(p,
+        [?(pending_passenger(p)),
+         pi(src, [?(passenger_at(p, src)),
+         pi(dst, [?(request_to(p, dst)),
+                   serve_passenger(p, src, dst)])])])).
+
+proc(recharge_battery,
+    pi(L,
+        [?(charge_station(L)),
+         go_somewhere,
+         recharge(L)])).
+
+proc(serve_battery_aware,
+    [serve_some_passenger,
+     if((battery_level(B), B < 25), recharge_battery, true)]).
+
+/*CONTROLLERS*/
+
+proc(control(wander), search(wander)).
+proc(wander, [
+  star(go_somewhere),
+  ?(taxi_at(park1))
+]).
+actionNum(X, X).
