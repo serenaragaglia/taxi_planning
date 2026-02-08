@@ -3,7 +3,7 @@
     fun_fluent/1,
     rel_fluent/1,
     proc/2,
-    causes_val
+    causes_val/4,
     causes_true/3,
     causes_false/3.
 
@@ -127,20 +127,22 @@ distance(apartment1, mall, 6).
 
 execute(A, SR) :- ask_execute(A, SR).
 exog_occurs(_) :- fail.
-%% FLUENTS
+/* FLUENTS */
 
-prim_fluent(taxi_at(L)) :- location(L).
-prim_fluent(passenger_at(P,L)) :- passenger(P), location(L).
-prim_fluent(on_taxi(P)) :- passenger(P).
-prim_fluent(request_to(P,L)) :- passenger(P), location(L).
+rel_fluent(taxi_at(L)) :- location(L).
+causes_val(move(_,L2), taxi_at(L2), true, true).
+causes_val(move(L1,_), taxi_at(L1), false, true).
+
+
+rel_fluent(passenger_at(P,L)) :- passenger(P), location(L).
+rel_fluent(on_taxi(P)) :- passenger(P).
+rel_fluent(request_to(P,L)) :- passenger(P), location(L).
 
 fun_fluent(battery_level).
 fun_fluent(total_cost).
 
+/* relational fluent declarations (boolean fluents) */
 %% TRAFFIC LIGHT FLUENTS
-
-prim_fluent(light_green(L)) :- location(L).
-prim_fluent(light_red(L)) :- location(L).
 
 %% ACTIONS
 
@@ -151,29 +153,29 @@ prim_action(recharge(L)) :- location(L).
 
 %% ACTION PRECONDITIONS
 
-poss(move(L1,L2), (
+poss(move(L1,L2), and(
     taxi_at(L1),
-    road(L1,L2),
-    battery_level(B),
+    road(L1,L2)
+    /* battery_level(B),
     distance(L1,L2,D),
     cost_per_distance(C),
-    B >= D * C
+    B >= D * C */
 )).
 
-poss(pickup(P,L), (
+poss(pickup(P,L), and(
     taxi_at(L),
     passenger_at(P,L),
     request_to(P,_),
     \+ on_taxi(_)
 )).
 
-poss(getOff(P,L), (
+poss(getOff(P,L), and(
     on_taxi(P),
     taxi_at(L),
     request_to(P,L)
 )).
 
-poss(recharge(L), (
+poss(recharge(L), and(
     taxi_at(L),
     charge_station(L),
     battery_level(B),
@@ -181,8 +183,6 @@ poss(recharge(L), (
 )).
 
 /*Successor state axioms*/
-causes_val(move(_,L2), taxi_at(L2), true, true).
-causes_val(move(L1,_), taxi_at(L1), false, true).
 
 causes_val(pickup(P,_), on_taxi(P), true, true).
 causes_val(pickup(P,L), passenger_at(P,L), false, true).
@@ -226,8 +226,8 @@ initially(request_to(p4, airport), true).
 
 initially(on_taxi(P), false) :- passenger(P).
 
-initially(battery_level(100), true).
-initially(total_cost(0), true).
+initially(battery_level, 100).
+initially(total_cost, 0).
 initially(light_green(L), true) :- location(L).
 
 /*proc(goTo(L), move(_,L)).
@@ -235,12 +235,12 @@ proc(pickUpPassenger(P,L), [goToL(L), pickup(P,L)]).
 proc(dropOffPassenger(P,L), [goToL(L), getOff(P,L)]).
 proc(recharge, ?(taxi_at(L), charge_station(L)), recharge(L)).*/
 
-proc(go_to_destination(L), while(neg(taxi_at(L)), pi(To, [?taxi_at(From), road(From, To), move(From, To)]))).
+proc(go_to_destination(L), while(neg(taxi_at(L)), pi(To, [taxi_at(From), road(From, To), move(From, To)]))).
 proc(serve_passenger(P, L1, L2), [pickup(P, L1), go_to_destination(L2), getOff(P, L2)]).
 proc(serve_some_passenger,
     pi(P,
-        [?request_to(P,L2),
-         ?passenger_at(P,L1),
+        [request_to(P,L2),
+         passenger_at(P,L1),
          serve_passenger(P,L1,L2)])).
 
 proc(recharge_battery,
@@ -251,10 +251,10 @@ proc(recharge_battery,
 
 proc(serve_battery_aware,
     [serve_some_passenger,
-     if((?battery_level(B), B < 25), recharge_battery, true)]).
+     if((battery_level(B), B < 25), recharge_battery, true)]).
 
 proc(control(basic),
 [
-    while(some(p, request_to(p, _)), serve_battery_aware),
-    go_to_destination(office)
+    while(some(p, request_to(p, _)), serve_some_passenger),
+    go_to_destination(office) 
 ]).
