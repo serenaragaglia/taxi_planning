@@ -17,6 +17,8 @@ location(restaurant).
 location(park1).
 location(park2).
 location(bank).
+location(office).
+
 passenger(p1).
 passenger(p2).
 passenger(p3).
@@ -24,17 +26,25 @@ passenger(p4).
 
 %% STATIC RELATIONS
 
-cost_per_distance(0).
+cost_per_distance(2).
+
 
 road(school, restaurant).
 road(restaurant, school).
 road(school, park2).
 road(park2, school).
-
 road(restaurant, park1).
 road(park1, restaurant).
 road(restaurant, bank).
 road(bank, restaurant).
+road(bank, park2).
+road(park2, bank).
+road(bank, office).
+road(office, bank).
+road(office, park2).
+road(park2, office).
+road(office, park1).
+road(park1, office).
 
 distance(school, restaurant, 5).
 distance(restaurant, school, 5).
@@ -44,6 +54,14 @@ distance(restaurant, park1, 4).
 distance(park1, restaurant, 4).
 distance(restaurant, bank, 5).
 distance(bank, restaurant, 5).
+distance(bank, park2, 6).
+distance(park2, bank, 6).
+distance(bank, office, 8).
+distance(office, bank, 8).
+distance(office, park2, 5).
+distance(park2, office, 5).
+distance(office, park1, 4).
+distance(park1, office, 4).
 
 charge_station(chargeStation1).
 charge_station(chargeStation2).
@@ -140,7 +158,7 @@ exog_occurs(_) :- fail.
 
 /* INITIAL STATE */
 
-initially(taxi_at(school), true).
+initially(taxi_at(office), true).
 initially(taxi_at(L), false) :- location(L), L \= school.
 
 initially(passenger_at(p1, restaurant), true).
@@ -157,8 +175,20 @@ initially(total_cost, 0).
 proc(some_pending, some(p, some(l, request_to(p, l)))).
 proc(pending_passenger(P), some(l, request_to(P, l))).
 
+proc(pi_move, pi([l1, l2], move(l1, l2))).
+proc(pi_pickup, pi([p, l], pickUp(p, l))).
+proc(pi_dropoff, pi([p, l], getOff(p, l))).
+proc(pi_recharge, pi(l, recharge(l))).
 
+proc(final_condition, neg(some(p, some(l, request_to(p, l))))).
 
+proc(random_walk, star(pi([l1, l2], move(l1, l2)))).
+
+proc(random_action, 
+    ndet(pi_dropoff, 
+        ndet(pi_pickup, 
+            ndet(pi_move, 
+                ndet(pi_recharge))))).
 /* COMPLEX ACTIONS */
 
 
@@ -172,9 +202,22 @@ proc(go_somewhere,
     ])
   ])
 ).
-proc(serve_passenger(P, L1, L2),
-    [go_somewhere]).
 
+
+proc(go_to_destination(L),
+    while(neg(taxi_at(L)),
+        pi(from,
+        pi(to,
+            [?(taxi_at(from)),
+             ?(road(from, to)),
+             move(from, to)])))).
+
+proc(serve_passenger(P, Src, Dst),
+    [go_to_destination(Src),
+     pickUp(P, Src),
+     go_to_destination(Dst),
+     getOff(P, Dst)]).
+    
 % safe_move: only execute move(L1,L2) if taxi is currently at L1
 proc(safe_move(L1, L2), [?(taxi_at(L1)), move(L1, L2)]) :-
     location(L1), location(L2).
@@ -200,7 +243,27 @@ proc(serve_battery_aware,
 
 proc(control(wander), search(wander)).
 proc(wander, [
-  star(go_somewhere),
+  star(random_action),
   ?(taxi_at(park1))
 ]).
+
+proc(control(dumb), search(dumb)).
+proc(dumb, [
+  star(random_action),
+  ?(passenger_at(p1, park2))
+]).
+
+
+proc(control(basic),[
+while(some_pending, serve_some_passenger),
+     go_to_destination(office1)]).
+
+
+proc(control(basic-search), search(basic)).
+proc(basic, [
+    while(some_pending, serve_some_passenger),
+    go_to_destination(office)
+]).
+
+
 actionNum(X, X).
