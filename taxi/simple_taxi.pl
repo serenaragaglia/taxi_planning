@@ -18,6 +18,7 @@ location(park1).
 location(park2).
 location(bank).
 location(office).
+location(pub).
 
 passenger(p1).
 passenger(p2).
@@ -45,6 +46,8 @@ road(office, park2).
 road(park2, office).
 road(office, park1).
 road(park1, office).
+road(school, pub).
+road(pub, school).
 
 distance(school, restaurant, 5).
 distance(restaurant, school, 5).
@@ -62,14 +65,8 @@ distance(office, park2, 5).
 distance(park2, office, 5).
 distance(office, park1, 4).
 distance(park1, office, 4).
-
-charge_station(chargeStation1).
-charge_station(chargeStation2).
-
-congested(apartment1).
-congested(mall).
-congested(park2).
-congested(airport).
+distance(school, pub, 7).
+distance(pub, school, 7).
 
 
 /* FLUENTS  and  CAUSAL LAWS */
@@ -98,7 +95,6 @@ causes_false(move(L1,_L2), last_at(X), X \= L1).
 % request_to
 rel_fluent(request_to(P, L)) :- passenger(P), location(L).
 causes_false(getOff(P, L), request_to(P, L), true).
-causes_true(pickUp(P, _), request_to(P, _), true).
 
 % battery_level
 fun_fluent(battery_level).
@@ -144,8 +140,7 @@ prim_action(pickUp(P, L)) :- passenger(P), location(L).
 poss(pickUp(P, L),
     and(passenger_at(P, L),
     and(taxi_at(L),
-    and(some(l, request_to(P, l)),
-        neg(some(j, on_taxi(j))))))).
+        neg(some(j, on_taxi(j)))))).
 
 prim_action(getOff(P, L)) :- passenger(P), location(L).
 poss(getOff(P, L),
@@ -158,16 +153,17 @@ exog_occurs(_) :- fail.
 
 /* INITIAL STATE */
 
-initially(taxi_at(office), true).
-initially(taxi_at(L), false) :- location(L), L \= school.
+initially(taxi_at(park1), true).
+initially(taxi_at(L), false) :- location(L), \+ initially(taxi_at(L), true).
 
-initially(passenger_at(p1, restaurant), true).
-initially(passenger_at(P, L), false) :-
-    passenger(P), location(L), \+ initially(passenger_at(P, L), true).
+initially(passenger_at(p1, office), true).
+initially(passenger_at(P, L), false) :- passenger(P), location(L), \+ initially(passenger_at(P, L), true).
 
-initially(request_to(p1, park2), true).
+
+initially(request_to(p1, pub), true).
 initially(request_to(P, L), false) :-
     passenger(P), location(L), \+ initially(request_to(P, L), true).
+
 
 initially(on_taxi(P), false) :- passenger(P).
 initially(battery_level, 100).
@@ -250,7 +246,7 @@ proc(wander, [
 proc(control(dumb), search(dumb)).
 proc(dumb, [
   star(random_action),
-  ?(passenger_at(p1, park2))
+  ?(final_condition)
 ]).
 
 
