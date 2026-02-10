@@ -8,7 +8,7 @@ downward domain.pddl problem.pddl --search "astar(blind())"
 downward domain.pddl problem.pddl --search "astar(lmcut())"
 
 enhsp -o domain.pddl -f problem1.pddl -h hmax -s Greedy
-enhsp -o domain.pddl -f problem2.pddl -h hmax -s Greedy
+enhsp -o domain.pddl -f problem2.pddl -h hmax -s Greedy >> resuslts/ p2_greedy_hmax.txt
 enhsp -o domain.pddl -f problem3.pddl -h hmax -s Greedy 
 
 enhsp -o domain.pddl -f problem1.pddl -h hmax -s AStar
