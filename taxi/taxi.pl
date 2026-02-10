@@ -19,16 +19,18 @@ location(park2).
 location(bank).
 location(office).
 location(pub).
+location(charge_station1).
 
 passenger(p1).
 passenger(p2).
 passenger(p3).
 passenger(p4).
 
+charge_station(charge_station1).
+
 %% STATIC RELATIONS
 
 cost_per_distance(2).
-
 
 road(school, restaurant).
 road(restaurant, school).
@@ -48,6 +50,8 @@ road(office, park1).
 road(park1, office).
 road(school, pub).
 road(pub, school).
+road(office, charge_station1).
+road(charge_station1, office).
 
 distance(school, restaurant, 5).
 distance(restaurant, school, 5).
@@ -67,6 +71,8 @@ distance(office, park1, 4).
 distance(park1, office, 4).
 distance(school, pub, 7).
 distance(pub, school, 7).
+distance(office, charge_station1, 3).
+distance(charge_station1, office, 3).
 
 
 /* FLUENTS  and  CAUSAL LAWS */
@@ -153,11 +159,15 @@ initially(taxi_at(L), false) :- location(L), \+ initially(taxi_at(L), true).
 
 initially(passenger_at(p1, office), true).
 initially(passenger_at(p2, school), true).
+initially(passenger_at(p3, restaurant), true).
+initially(passenger_at(p4, bank), true).
 initially(passenger_at(P, L), false) :- passenger(P), location(L), \+ initially(passenger_at(P, L), true).
 
 
 initially(request_to(p1, pub), true).
 initially(request_to(p2, restaurant), true).
+initially(request_to(p3, bank), true).
+initially(request_to(p4, pub), true).
 initially(request_to(P, L), false) :-
     passenger(P), location(L), \+ initially(request_to(P, L), true).
 
@@ -211,12 +221,12 @@ proc(serve_some_passenger,
 proc(recharge_battery,
     pi(L,
         [?(charge_station(L)),
-         go_somewhere,
+         go_to_destination(L),
          recharge(L)])).
 
 proc(serve_battery_aware,
     [serve_some_passenger,
-     if((battery_level(B), B < 25), recharge_battery, true)]).
+     if((battery_level < 40), recharge_battery, true)]).
 
 /*CONTROLLERS*/
 
@@ -235,7 +245,7 @@ proc(dumb, [
 
 proc(control(basic), search(basic)).
 proc(basic, [
-    while(some_pending, serve_some_passenger),
+    while(some_pending, serve_battery_aware),
     go_to_destination(office)
 ]).
 
