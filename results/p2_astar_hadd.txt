@@ -1,0 +1,86 @@
+Domain parsed
+Problem parsed
+Grounding..
+Grounding Time: 46
+Aibr Preprocessing
+|F|:110
+|X|:1
+|A|:54
+|P|:0
+|E|:0
+H1 Setup Time (msec): 14
+ g(n)= 30.0 h(n)=414.0
+ g(n)= 48.0 h(n)=384.0
+ g(n)= 84.0 h(n)=366.0
+ g(n)= 240.0 h(n)=348.0
+ g(n)= 286.0 h(n)=306.0
+ g(n)= 322.0 h(n)=270.0
+ g(n)= 478.0 h(n)=240.0
+ g(n)= 560.0 h(n)=204.0
+ g(n)= 638.0 h(n)=198.0
+ g(n)= 662.0 h(n)=168.0
+ g(n)= 686.0 h(n)=150.0
+ g(n)= 710.0 h(n)=108.0
+ g(n)= 734.0 h(n)=84.0
+ g(n)= 810.0 h(n)=78.0
+ g(n)= 828.0 h(n)=60.0
+ g(n)= 840.0 h(n)=48.0
+ g(n)= 888.0 h(n)=0.0
+Problem Solved
+
+Found Plan:
+0.0: (move office park1)
+1.0: (move park1 restaurant)
+2.0: (move restaurant apartment2)
+3.0: (move apartment2 restaurant)
+4.0: (move restaurant apartment2)
+5.0: (move apartment2 pub)
+6.0: (move pub apartment2)
+7.0: (pickUp p3 apartment2)
+8.0: (move apartment2 pub)
+9.0: (move pub mall)
+10.0: (getOff p3 mall)
+11.0: (move mall pub)
+12.0: (move pub chargeStation1)
+13.0: (recharge chargeStation1)
+14.0: (move chargeStation1 park2)
+15.0: (move park2 school)
+16.0: (move school restaurant)
+17.0: (move restaurant school)
+18.0: (move school restaurant)
+19.0: (pickUp p1 restaurant)
+20.0: (move restaurant school)
+21.0: (move school park2)
+22.0: (getOff p1 park2)
+23.0: (move park2 chargeStation1)
+24.0: (recharge chargeStation1)
+25.0: (move chargeStation1 park2)
+26.0: (move park2 school)
+27.0: (pickUp p2 school)
+28.0: (move school restaurant)
+29.0: (move restaurant park1)
+30.0: (move park1 office)
+31.0: (move office apartment1)
+32.0: (getOff p2 apartment1)
+33.0: (move apartment1 office)
+34.0: (move office park1)
+35.0: (pickUp p4 park1)
+36.0: (move park1 restaurant)
+37.0: (move restaurant apartment2)
+38.0: (move apartment2 pub)
+39.0: (move pub chargeStation1)
+40.0: (recharge chargeStation1)
+41.0: (move chargeStation1 pub)
+42.0: (move pub apartment2)
+43.0: (move apartment2 airport)
+44.0: (getOff p4 airport)
+
+Plan-Length:45
+Metric (Search):888.0
+Planning Time (msec): 223
+Heuristic Time (msec): 151
+Search Time (msec): 217
+Expanded Nodes:1063
+States Evaluated:2113
+Number of Dead-Ends detected:281
+Number of Duplicates detected:1426

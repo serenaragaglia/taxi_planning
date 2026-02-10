@@ -1,0 +1,83 @@
+Domain parsed
+Problem parsed
+Grounding..
+Grounding Time: 67
+Aibr Preprocessing
+|F|:110
+|X|:1
+|A|:54
+|P|:0
+|E|:0
+H1 Setup Time (msec): 14
+ g(n)= 30.0 h(n)=96.0
+ g(n)= 48.0 h(n)=78.0
+ g(n)= 66.0 h(n)=72.0
+ g(n)= 720.0 h(n)=54.0
+ g(n)= 942.0 h(n)=24.0
+ g(n)= 966.0 h(n)=0.0
+Problem Solved
+
+Found Plan:
+0.0: (move office park1)
+1.0: (move park1 restaurant)
+2.0: (pickUp p1 restaurant)
+3.0: (move restaurant school)
+4.0: (move school park2)
+5.0: (getOff p1 park2)
+6.0: (move park2 chargeStation1)
+7.0: (recharge chargeStation1)
+8.0: (move chargeStation1 pub)
+9.0: (move pub apartment2)
+10.0: (pickUp p3 apartment2)
+11.0: (move apartment2 pub)
+12.0: (move pub mall)
+13.0: (getOff p3 mall)
+14.0: (move mall pub)
+15.0: (move pub apartment2)
+16.0: (move apartment2 restaurant)
+17.0: (move restaurant park1)
+18.0: (pickUp p4 park1)
+19.0: (move park1 restaurant)
+20.0: (move restaurant apartment2)
+21.0: (move apartment2 pub)
+22.0: (move pub chargeStation1)
+23.0: (recharge chargeStation1)
+24.0: (move chargeStation1 pub)
+25.0: (move pub chargeStation1)
+26.0: (move chargeStation1 pub)
+27.0: (move pub apartment2)
+28.0: (move apartment2 pub)
+29.0: (move pub apartment2)
+30.0: (move apartment2 pub)
+31.0: (move pub apartment2)
+32.0: (move apartment2 pub)
+33.0: (move pub apartment2)
+34.0: (move apartment2 pub)
+35.0: (move pub apartment2)
+36.0: (move apartment2 airport)
+37.0: (getOff p4 airport)
+38.0: (move airport apartment2)
+39.0: (move apartment2 pub)
+40.0: (move pub chargeStation1)
+41.0: (recharge chargeStation1)
+42.0: (move chargeStation1 park2)
+43.0: (move park2 office)
+44.0: (move office park2)
+45.0: (move park2 office)
+46.0: (move office park2)
+47.0: (move park2 school)
+48.0: (pickUp p2 school)
+49.0: (move school park2)
+50.0: (move park2 office)
+51.0: (move office apartment1)
+52.0: (getOff p2 apartment1)
+
+Plan-Length:53
+Metric (Search):966.0
+Planning Time (msec): 1031
+Heuristic Time (msec): 794
+Search Time (msec): 1023
+Expanded Nodes:14814
+States Evaluated:24028
+Number of Dead-Ends detected:3801
+Number of Duplicates detected:17811

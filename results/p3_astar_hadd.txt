@@ -1,0 +1,124 @@
+Domain parsed
+Problem parsed
+Grounding..
+Grounding Time: 57
+Aibr Preprocessing
+|F|:106
+|X|:1
+|A|:58
+|P|:0
+|E|:0
+H1 Setup Time (msec): 15
+ g(n)= 3.0 h(n)=432.0
+ g(n)= 259.0 h(n)=372.0
+ g(n)= 289.0 h(n)=357.0
+ g(n)= 313.0 h(n)=327.0
+ g(n)= 316.0 h(n)=324.0
+ g(n)= 820.0 h(n)=252.0
+ g(n)= 823.0 h(n)=246.0
+ g(n)= 847.0 h(n)=234.0
+-------------Time: 10s ; Expanded Nodes: 158726 (Avg-Speed 15872.0 n/s); Evaluated States: 250576
+ g(n)= 1311.0 h(n)=195.0
+ g(n)= 1335.0 h(n)=147.0
+ g(n)= 1338.0 h(n)=144.0
+ g(n)= 1540.0 h(n)=108.0
+ g(n)= 1564.0 h(n)=84.0
+ g(n)= 1588.0 h(n)=60.0
+ g(n)= 1612.0 h(n)=36.0
+ g(n)= 1648.0 h(n)=0.0
+Problem Solved
+
+Found Plan:
+0.0: (switchLight mall pub)
+1.0: (switchLight pub mall)
+2.0: (move office1 park2)
+3.0: (move park2 chargeStation1)
+4.0: (recharge chargeStation1)
+5.0: (move chargeStation1 park2)
+6.0: (switchLight bank restaurant)
+7.0: (switchLight restaurant bank)
+8.0: (move park2 chargeStation1)
+9.0: (move chargeStation1 park2)
+10.0: (switchLight park1 office1)
+11.0: (move park2 school)
+12.0: (move school restaurant)
+13.0: (pickUp p1 restaurant)
+14.0: (move restaurant school)
+15.0: (move school park2)
+16.0: (getOff p1 park2)
+17.0: (move park2 chargeStation1)
+18.0: (recharge chargeStation1)
+19.0: (move chargeStation1 park2)
+20.0: (move park2 bank)
+21.0: (move bank restaurant)
+22.0: (move restaurant park1)
+23.0: (move park1 office1)
+24.0: (move office1 park2)
+25.0: (move park2 chargeStation1)
+26.0: (recharge chargeStation1)
+27.0: (move chargeStation1 park2)
+28.0: (move park2 office1)
+29.0: (move office1 park2)
+30.0: (move park2 office1)
+31.0: (switchLight office1 park1)
+32.0: (move office1 park2)
+33.0: (move park2 chargeStation1)
+34.0: (move chargeStation1 pub)
+35.0: (pickUp p2 pub)
+36.0: (move pub mall)
+37.0: (move mall apartment1)
+38.0: (move apartment1 hotel)
+39.0: (getOff p2 hotel)
+40.0: (move hotel chargeStation2)
+41.0: (recharge chargeStation2)
+42.0: (move chargeStation2 park1)
+43.0: (switchLight bank restaurant)
+44.0: (move park1 restaurant)
+45.0: (move restaurant bank)
+46.0: (move bank park2)
+47.0: (move park2 chargeStation1)
+48.0: (recharge chargeStation1)
+49.0: (move chargeStation1 park2)
+50.0: (move park2 chargeStation1)
+51.0: (move chargeStation1 park2)
+52.0: (move park2 office1)
+53.0: (move office1 park1)
+54.0: (move park1 chargeStation2)
+55.0: (recharge chargeStation2)
+56.0: (move chargeStation2 park1)
+57.0: (switchLight park1 office1)
+58.0: (move park1 office1)
+59.0: (switchLight pub mall)
+60.0: (switchLight park1 office1)
+61.0: (switchLight restaurant bank)
+62.0: (move office1 park2)
+63.0: (move park2 school)
+64.0: (pickUp p4 school)
+65.0: (move school park2)
+66.0: (move park2 office1)
+67.0: (move office1 apartment1)
+68.0: (switchLight office1 park1)
+69.0: (getOff p4 apartment1)
+70.0: (move apartment1 hotel)
+71.0: (move hotel chargeStation2)
+72.0: (recharge chargeStation2)
+73.0: (move chargeStation2 park1)
+74.0: (move park1 restaurant)
+75.0: (move restaurant apartment2)
+76.0: (pickUp p3 apartment2)
+77.0: (move apartment2 restaurant)
+78.0: (move restaurant park1)
+79.0: (move park1 office1)
+80.0: (move office1 apartment1)
+81.0: (move apartment1 mall)
+82.0: (getOff p3 mall)
+
+Plan-Length:83
+Metric (Search):1648.0
+Planning Time (msec): 14943
+Heuristic Time (msec): 12987
+Search Time (msec): 14939
+Expanded Nodes:250202
+States Evaluated:401887
+Number of Dead-Ends detected:82843
+Number of Duplicates detected:1084541
