@@ -144,11 +144,11 @@ poss(getOff(P, L),
 
 execute(A, SR) :- ask_execute(A, SR).
 
-% exogenous actions for congestion
+prim_action(Act) :- exog_action(Act).
+
+/*% exogenous actions for congestion
 exog_action(start(L)) :- location(L).
 exog_action(end(L)) :- location(L).
-
-prim_action(Act) :- exog_action(Act).
 
 % poss for exog actions
 poss(start(L), congested(L) = false) :- location(L).
@@ -157,20 +157,22 @@ poss(end(L), congested(L) = true) :- location(L).
 % effect of exog actions
 causes_false(end(L), congested(L), true).
 causes_true(start(L), congested(L), true).
-
-/* exogenous actions for requests
-exog_action(call(P, L)) :- passenger(P), location(L).
-poss(call(P,L), neg(some(j, request_to(P, j) ) ) ) :- passenger(P), location(L).
-
-causes_true(call(P, L), request_to(P, L), true).*/
-
-
+*/
 % changing world
 rel_fluent(has_changed).
 causes_true(start(_L), has_changed, true).
 causes_true(end(_L), has_changed, true).
 
 % causes_true(call(_P, _L), has_changed, true).
+
+
+% exogenous actions for requests
+exog_action(call(P, L)) :- passenger(P), location(L).
+poss(call(P,L), neg(some(j, request_to(P, j) ) ) ) :- passenger(P), location(L).
+
+causes_true(call(P, L), request_to(P, L), true).
+
+
 
 /* INITIAL STATE */
 
@@ -299,9 +301,9 @@ proc(congested_smarter, [while(and(neg(final_condition), battery_level > 10), se
 /*Reactive controller*/
 proc(control(reactive), [
     prioritized_interrupts([
-        interrupt(has_changed, [
+        interrupt(neg(final_condition), [
             unset(has_changed),
-            gexec(has_changed, search(congested_smarter))
+            gexec(neg(has_changed), search(basic-battery))
         ])
     ]),
     search(basic)
