@@ -19,6 +19,9 @@ location(park2).
 location(bank).
 location(office).
 location(pub).
+location(charge_station1).
+
+charge_station(charge_station1).
 
 passenger(p1).
 passenger(p2).
@@ -38,6 +41,8 @@ road(bank, office). road(office, bank).
 road(office, park2). road(park2, office).
 road(office, park1). road(park1, office).
 road(school, pub). road(pub, school).
+road(charge_station1, pub). road(pub, charge_station1).
+road(charge_station1, restaurant). road(restaurant, charge_station1).
 
 
 distance(school, restaurant, 5). distance(restaurant, school, 5).
@@ -49,6 +54,8 @@ distance(bank, office, 4). distance(office, bank, 4).
 distance(office, park2, 6). distance(park2, office, 6).
 distance(office, park1, 4). distance(park1, office, 4).
 distance(school, pub, 7). distance(pub, school, 7).
+distance(charge_station1, restaurant, 1). distance(restaurant, charge_station1, 1).
+distance(charge_station1, pub, 2). distance(pub, charge_station1, 2).
 
 
 /* FLUENTS  and  CAUSAL LAWS */
@@ -185,7 +192,7 @@ initially(congested(L), false):- location(L).
 initially(has_changed, false).
 
 initially(on_taxi(P), false) :- passenger(P).
-initially(battery_level, 100).
+initially(battery_level, 90).
 initially(total_cost, 0).
 proc(some_pending, some(p, some(l, request_to(p, l)))).
 proc(pending_passenger(P), some(l, request_to(P, l))).
@@ -213,6 +220,16 @@ proc(go_to_destination(L),
              ?(road(from, to)),
              move(from, to)])))).
 
+proc(move_smarter(L),
+    while(neg(taxi_at(L)),
+        pi(from,
+        pi(to,
+            [ ?(taxi_at(from)),
+              ?(road(from, to)),
+              ?(neg(congested(to))),
+              move(from, to)
+            ])))).           
+
 proc(serve_passenger(P, Src, Dst),
     [go_to_destination(Src),
      pickUp(P, Src),
@@ -225,6 +242,30 @@ proc(serve_some_passenger,
          pi(src, [?(passenger_at(p, src)),
          pi(dst, [?(request_to(p, dst)),
                    serve_passenger(p, src, dst)])])])).
+
+proc(go_to_recharge,
+     [ go_to_destination(charge_station1),
+       recharge(charge_station1) ]).
+
+proc(recharging,
+     [ while(battery_level > 50,
+             serve_some_passenger),
+       go_to_recharge ]).
+                 
+
+proc(serve_smarter(P, Src, Dst),
+    [move_smarter(Src),
+     pickUp(P, Src),
+     go_to_destination(Dst),
+     getOff(P, Dst)]). 
+
+proc(serve_some_smarter,
+    pi(p,
+        [?(pending_passenger(p)),
+         pi(src, [?(passenger_at(p, src)),
+         pi(dst, [?(request_to(p, dst)),
+                   serve_smarter(p, src, dst)])])])).
+
 
 /*CONTROLLERS*/
 
@@ -240,16 +281,27 @@ proc(dumb, [
   ?(final_condition)
 ]).
 
-proc(control(basic), search(basic)).
-proc(basic, [
-    while(and(neg(final_condition), battery_level > 10), serve_some_passenger), go_to_destination(office)]).
+/*proc(basic, [
+    while(neg(final_condition), recharging), go_to_destination(office)]).*/
+
+proc(control(basic-battery), search(basic-battery)).
+proc(basic-battery,
+    while(neg(final_condition),
+        if(battery_level =< 80,
+           go_to_recharge,
+           serve_some_passenger)
+    )
+).
+
+proc(control(congested_smarter), search(congested_smarter)).
+proc(congested_smarter, [while(and(neg(final_condition), battery_level > 10), serve_some_smarter), go_to_destination(office)]).
 
 /*Reactive controller*/
 proc(control(reactive), [
     prioritized_interrupts([
         interrupt(has_changed, [
             unset(has_changed),
-            gexec(has_changed, search(dumb))
+            gexec(has_changed, search(congested_smarter))
         ])
     ]),
     search(basic)
