@@ -45,7 +45,7 @@ road(charge_station1, pub). road(pub, charge_station1).
 road(charge_station1, restaurant). road(restaurant, charge_station1).
 
 
-distance(school, restaurant, 5). distance(restaurant, school, 5).
+distance(school, restaurant, 10). distance(restaurant, school, 10).
 distance(school, park2, 6). distance(park2, school, 6).
 distance(restaurant, park1, 4). distance(park1, restaurant, 4).
 distance(restaurant, bank, 5). distance(bank, restaurant, 5).
@@ -146,7 +146,7 @@ execute(A, SR) :- ask_execute(A, SR).
 
 prim_action(Act) :- exog_action(Act).
 
-/*% exogenous actions for congestion
+% exogenous actions for congestion
 exog_action(start(L)) :- location(L).
 exog_action(end(L)) :- location(L).
 
@@ -157,7 +157,6 @@ poss(end(L), congested(L) = true) :- location(L).
 % effect of exog actions
 causes_false(end(L), congested(L), true).
 causes_true(start(L), congested(L), true).
-*/
 % changing world
 rel_fluent(has_changed).
 causes_true(start(_L), has_changed, true).
@@ -168,9 +167,16 @@ causes_true(end(_L), has_changed, true).
 
 % exogenous actions for requests
 exog_action(call(P, L)) :- passenger(P), location(L).
-poss(call(P,L), neg(some(j, request_to(P, j) ) ) ) :- passenger(P), location(L).
+poss(call(P,L), true) :- passenger(P), location(L).
 
 causes_true(call(P, L), request_to(P, L), true).
+causes_false(call(P, L), request_to(P, L0), true) :- location(L0), L0 \= L.
+
+exog_action(move_p(P, L)) :- passenger(P), location(L).
+poss(move_p(P, L), true) :- passenger(P), location(L).
+causes_true(move_p(P, L), passenger_at(P, L), true).
+causes_false(move_p(P, L), passenger_at(P, L0), true) :- location(L0), L0 \= L. 
+
 
 
 
