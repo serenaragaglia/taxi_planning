@@ -120,3 +120,14 @@ projection_task :-
     ->  format("Condition ~w HOLDS after executing ~w~n", [COND, SEQ])
     ;   format("Condition ~w DOES NOT HOLD after executing ~w~n", [COND, SEQ])
     ).
+
+regression_task :-
+	format("Write the goal situation 'and(f1(), neg(f2())).':~n", []),
+    read(end_state),
+	(	indigolog(search([
+			star(random_action),
+  			?(end_state)
+		]))
+	->  format("Goal situation ~w IS reachable from initial situation~n", [end_state])
+    ;   format("Goal situation ~w is NOT reachable from initial situation~n", [end_state])
+	).
