@@ -11,7 +11,6 @@ cache(_) :- fail.
 
 %% DOMAIN OBJECTS
 
-
 location(school).
 location(restaurant).
 location(park1).
@@ -22,6 +21,7 @@ location(pub).
 location(charge_station1).
 
 charge_station(charge_station1).
+charge_station(charge_station2).
 
 passenger(p1).
 passenger(p2).
@@ -43,7 +43,8 @@ road(office, park1). road(park1, office).
 road(school, pub). road(pub, school).
 road(charge_station1, pub). road(pub, charge_station1).
 road(charge_station1, restaurant). road(restaurant, charge_station1).
-
+road(charge_station2, park1). road(park1, charge_station2).
+road(charge_station2, office). road(office, charge_station2).
 
 distance(school, restaurant, 10). distance(restaurant, school, 10).
 distance(school, park2, 6). distance(park2, school, 6).
@@ -56,6 +57,8 @@ distance(office, park1, 4). distance(park1, office, 4).
 distance(school, pub, 7). distance(pub, school, 7).
 distance(charge_station1, restaurant, 1). distance(restaurant, charge_station1, 1).
 distance(charge_station1, pub, 2). distance(pub, charge_station1, 2).
+distance(charge_station2, park1, 6). distance(park1, charge_station2, 6).
+distance(charge_station2, office, 5). distance(office, charge_station2, 5).
 
 
 /* FLUENTS  and  CAUSAL LAWS */
@@ -177,9 +180,6 @@ poss(move_p(P, L), true) :- passenger(P), location(L).
 causes_true(move_p(P, L), passenger_at(P, L), true).
 causes_false(move_p(P, L), passenger_at(P, L0), true) :- location(L0), L0 \= L. 
 
-
-
-
 /* INITIAL STATE */
 
 initially(taxi_at(park1), true).
@@ -254,8 +254,11 @@ proc(serve_some_passenger,
                    serve_passenger(p, src, dst)])])])).
 
 proc(go_to_recharge,
-     [ go_to_destination(charge_station1),
-       recharge(charge_station1) ]).
+     pi(c,      
+            [?(charge_station(c)),        
+            go_to_destination(c),
+            recharge(c)])
+).
 
 proc(recharging,
      [ while(battery_level > 50,
