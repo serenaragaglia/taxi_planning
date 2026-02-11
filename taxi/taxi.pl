@@ -181,6 +181,8 @@ initially(taxi_at(L), false) :- location(L), \+ initially(taxi_at(L), true).
 
 initially(passenger_at(p1, office), true).
 initially(passenger_at(p2, school), true).
+initially(passenger_at(p3, bank), true).
+initially(passenger_at(p4, park2), true).
 initially(passenger_at(P, L), false) :- passenger(P), location(L), \+ initially(passenger_at(P, L), true).
 
 initially(request_to(p1, pub), true).
@@ -303,10 +305,10 @@ proc(control(reactive), [
     prioritized_interrupts([
         interrupt(neg(final_condition), [
             unset(has_changed),
-            gexec(neg(has_changed), search(basic-battery))
-        ])
-    ]),
-    search(basic)
+            gexec(neg(has_changed), search(basic-battery))]),
+    interrupt(true, say("Waiting...")),
+    interrupt(true, ?(wait_exog_action))
+    ])
 ]).
 
 
