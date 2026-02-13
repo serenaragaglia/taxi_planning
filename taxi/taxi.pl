@@ -316,8 +316,6 @@ proc(control(reactive), [
         interrupt(neg(final_condition), [
             unset(has_changed),
             gexec(neg(has_changed), search(basic-battery))]),
-    interrupt(true, say("Waiting...")),
-    interrupt(true, ?(wait_exog_action))
     ])
 ]).
 
