@@ -315,7 +315,7 @@ proc(control(reactive), [
     prioritized_interrupts([
         interrupt(neg(final_condition), [
             unset(has_changed),
-            gexec(neg(has_changed), search(basic-battery))]),
+            gexec(neg(has_changed), search(basic-battery))])
     ])
 ]).
 
