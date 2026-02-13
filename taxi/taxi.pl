@@ -19,6 +19,7 @@ location(bank).
 location(office).
 location(pub).
 location(charge_station1).
+location(charge_station2).
 
 charge_station(charge_station1).
 charge_station(charge_station2).
